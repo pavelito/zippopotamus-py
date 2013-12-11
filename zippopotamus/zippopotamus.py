@@ -21,7 +21,7 @@ class Zippopotamus:
 
 	def getAPIResult(self, zipcode):
 		apiUrl = 'http://api.zippopotam.us/'
-		requestUrl = apiUrl + self.countryCode + '/' +zipcode
+		requestUrl = apiUrl + self.countryCode + '/' + urllib2.quote(zipcode)
 		try:
 			response = urllib2.urlopen(requestUrl)
 			result = json.load(response)
