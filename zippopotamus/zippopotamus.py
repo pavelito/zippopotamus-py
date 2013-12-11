@@ -20,7 +20,15 @@ class Zippopotamus:
 		try:
 			response = urllib2.urlopen(requestUrl)
 			result = json.load(response)
-			return self.unicodeToUTF8(result)
+			return self.unicodeToUTF8(result['places'][0])
 		except urllib2.URLError, e:
 			print 'Request Failed for ' + zipcode
 			return False
+
+	def state(self, zipcode):
+		places = self.places(zipcode)
+		return {'name': places['state'], 'abbreviation' : places['state abbreviation']}
+
+	def coordinates(self, zipcode):
+		places = self.places(zipcode)
+		return {'lat': places['latitude'], 'long': places['longitude']}
