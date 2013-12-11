@@ -1,8 +1,13 @@
 import urllib2, json
 
 class Zippopotamus:
+
+	def __init__(self, countryCode = 'us'):
+		self.countryCode = countryCode.lower()
+		self.cache = {}
+
 	def handleAPIError(self):
-		return False
+		pass
 
 	def unicodeToUTF8(self, input):
 	    if isinstance(input, dict):
@@ -14,21 +19,39 @@ class Zippopotamus:
 	    else:
 	        return input
 
-	def places(self, zipcode):
-		apiUrl = 'http://api.zippopotam.us/us/'
-		requestUrl = apiUrl + zipcode
+	def getAPIResult(self, zipcode):
+		apiUrl = 'http://api.zippopotam.us/'
+		requestUrl = apiUrl + self.countryCode + '/' +zipcode
 		try:
 			response = urllib2.urlopen(requestUrl)
 			result = json.load(response)
-			return self.unicodeToUTF8(result['places'][0])
+			self.cache[zipcode] = self.unicodeToUTF8(result)
+			return self.cache[zipcode]
 		except urllib2.URLError, e:
-			print 'Request Failed for ' + zipcode
+			#print 'Request Failed for ' + zipcode
 			return False
+
+	def __getResult(self, zipcode):
+		if zipcode in self.cache:
+			return self.cache[zipcode]
+		else:
+			return self.getAPIResult(zipcode)
+
+	def places(self, zipcode):
+		result = self.__getResult(zipcode)
+		if result == False:
+			return []
+		else:
+			return result['places']
 
 	def state(self, zipcode):
 		places = self.places(zipcode)
-		return {'name': places['state'], 'abbreviation' : places['state abbreviation']}
+		if not places:
+			return {}
+		return {'name': places[0]['state'], 'abbreviation' : places[0]['state abbreviation']}
 
 	def coordinates(self, zipcode):
 		places = self.places(zipcode)
-		return {'lat': places['latitude'], 'long': places['longitude']}
+		if not places:
+			return {}
+		return {'lat': places[0]['latitude'], 'long': places[0]['longitude']}
