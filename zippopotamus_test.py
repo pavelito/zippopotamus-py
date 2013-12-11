@@ -33,7 +33,3 @@ class TestZippopotamusPy(unittest.TestCase):
 
 if __name__ == '__main__':
 	unittest.main()
-	'''		
-	zippo = Zippopotamus('us')
-	print zippo.places('10010')
-	'''
